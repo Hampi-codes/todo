@@ -59,8 +59,6 @@ button:focus-visible {
   color: #fff !important;
   background-color: #3b3b3b !important;
   font-weight: bold !important;
-  width: 100px;
-  height: 100%;
 }
 
 .task_card {

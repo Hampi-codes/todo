@@ -1,5 +1,9 @@
 import { useSelector, useDispatch } from "react-redux";
-import { deleteTodo, updateTodo, toggleComplete } from "../redux/features/todo/todoSlice";
+import {
+  deleteTodo,
+  updateTodo,
+  toggleComplete,
+} from "../redux/features/todo/todoSlice";
 import { useState } from "react";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -43,16 +47,19 @@ export const Todos = () => {
                   display="flex"
                   justifyContent="center"
                   columnGap={2}
+                  marginBlock="6px"
                 >
-                  <Grid item>
+                  <Grid item flex="1">
                     <TextField
                       variant="outlined"
+                      inputProps={{ style: { height: "12px" } }}
                       type="text"
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
+                      fullWidth
                     />
                   </Grid>
-                  <Grid item columnGap={1} display="flex">
+                  <Grid item columnGap={2} display="flex" alignItems="center">
                     <Grid item>
                       <Button
                         className="edit_buttons"
@@ -79,7 +86,9 @@ export const Todos = () => {
                         display: "flex",
                         alignItems: "center",
                         columnGap: "6px",
-                        textDecoration: todo.completed ? "line-through" : "none",
+                        textDecoration: todo.completed
+                          ? "line-through"
+                          : "none",
                         color: todo.completed ? "gray" : "inherit",
                       }}
                     >
@@ -108,8 +117,9 @@ export const Todos = () => {
                         onMouseEnter={() => setHoveredIcon(`done-${todo.id}`)}
                         onMouseLeave={() => setHoveredIcon(null)}
                         onClick={() =>
-                            dispatch(toggleComplete({ id: todo.id }))
-                          }                      >
+                          dispatch(toggleComplete({ id: todo.id }))
+                        }
+                      >
                         {hoveredIcon === `done-${todo.id}` ? (
                           <DoneIcon />
                         ) : (
