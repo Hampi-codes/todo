@@ -8,10 +8,10 @@ function App() {
     <>
       <h2>Work list</h2>
       <Grid container alignItems="center" direction="column">
-        <Grid item xs={10} width="50%">
+        <Grid item width="70%">
           <AddTodo />
         </Grid>
-        <Grid item width="50%">
+        <Grid item width="70%">
           <Todos />
         </Grid>
       </Grid>

@@ -25,7 +25,7 @@ export const AddTodo = () => {
           justifyContent: "center",
         }}
       >
-        <Grid itme xs={6} display="flex">
+        <Grid itme xs={10} display="flex">
           <TextField
             type="text"
             variant="outlined"

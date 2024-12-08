@@ -12,6 +12,7 @@ import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined
 import DoneOutlineRoundedIcon from "@mui/icons-material/DoneOutlineRounded";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import RadioButtonCheckedIcon from "@mui/icons-material/RadioButtonChecked";
+import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import { TextField, Button, Grid, IconButton, Tooltip } from "@mui/material";
 
 export const Todos = () => {
@@ -20,6 +21,7 @@ export const Todos = () => {
   const [isUpdating, setIsUpdating] = useState(null);
   const [input, setInput] = useState("");
   const [hoveredIcon, setHoveredIcon] = useState(null);
+  const [draggedTodo, setDraggedTodo] = useState(null);
 
   const handleUpdate = (todo) => {
     setIsUpdating(todo.id);
@@ -34,13 +36,56 @@ export const Todos = () => {
     }
   };
 
+  // Handle drag start
+  const handleDragStart = (e, todo) => {
+    setDraggedTodo(todo);
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  // Handle drag over
+  const handleDragOver = (e) => {
+    e.preventDefault(); // Necessary to allow dropping
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  // Handle drop
+  const handleDrop = (e, targetTodo) => {
+    e.preventDefault();
+    if (draggedTodo && draggedTodo.id !== targetTodo.id) {
+      const newTodos = [...todos];
+      const draggedIndex = newTodos.findIndex((t) => t.id === draggedTodo.id);
+      const targetIndex = newTodos.findIndex((t) => t.id === targetTodo.id);
+
+      // Reorder todos
+      const [removedTodo] = newTodos.splice(draggedIndex, 1);
+      newTodos.splice(targetIndex, 0, removedTodo);
+
+      // Update the state
+      dispatch({ type: "todo/reorderTodos", payload: newTodos });
+    }
+    setDraggedTodo(null);
+  };
+
   return (
     <>
       <h2>Tasks</h2>
       {todos?.length > 0 ? (
         <>
           {todos?.map((todo) => (
-            <div key={todo.id}>
+            <div
+              key={todo.id}
+              draggable
+              onDragStart={(e) => handleDragStart(e, todo)}
+              onDragOver={handleDragOver}
+              onDrop={(e) => handleDrop(e, todo)}
+              style={{
+                border:
+                  draggedTodo?.id === todo.id ? "2px dashed #3f51b5" : "none",
+                borderRadius: "4px",
+                margin: "8px 0",
+                padding: "8px",
+              }}
+            >
               {isUpdating === todo.id ? (
                 <Grid
                   container
@@ -79,71 +124,85 @@ export const Todos = () => {
                   </Grid>
                 </Grid>
               ) : (
-                <Grid container className="task_card">
-                  <Grid item xs={9} justifyContent="flex-start" display="flex">
-                    <span
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        columnGap: "6px",
-                        textDecoration: todo.completed
-                          ? "line-through"
-                          : "none",
-                        color: todo.completed ? "gray" : "inherit",
-                      }}
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <DragIndicatorIcon
+                    fontSize="large"
+                    style={{ cursor: "grab" }}
+                  />
+                  <Grid container className="task_card" alignItems="center">
+                    <Grid
+                      item
+                      // xs={8}
+                      justifyContent="flex-start"
+                      display="flex"
+                      flex="1"
                     >
-                      <RadioButtonCheckedIcon />
-                      {todo.text}
-                    </span>
-                  </Grid>
-                  <Grid item xs={1}>
-                    <Tooltip title="Edit" placement="top" arrow>
-                      <IconButton
-                        onMouseEnter={() => setHoveredIcon(`edit-${todo.id}`)}
-                        onMouseLeave={() => setHoveredIcon(null)}
-                        onClick={() => handleUpdate(todo)}
+                      <span
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          columnGap: "6px",
+                          textDecoration: todo.completed
+                            ? "line-through"
+                            : "none",
+                          color: todo.completed ? "gray" : "inherit",
+                        }}
                       >
-                        {hoveredIcon === `edit-${todo.id}` ? (
-                          <EditIcon />
-                        ) : (
-                          <EditOutlinedIcon />
-                        )}
-                      </IconButton>
-                    </Tooltip>
+                        <RadioButtonCheckedIcon />
+                        {todo.text}
+                      </span>
+                    </Grid>
+                    <Grid item xs={1}>
+                      <Tooltip title="Edit" placement="top" arrow>
+                        <IconButton
+                          onMouseEnter={() => setHoveredIcon(`edit-${todo.id}`)}
+                          onMouseLeave={() => setHoveredIcon(null)}
+                          onClick={() => handleUpdate(todo)}
+                        >
+                          {hoveredIcon === `edit-${todo.id}` ? (
+                            <EditIcon />
+                          ) : (
+                            <EditOutlinedIcon />
+                          )}
+                        </IconButton>
+                      </Tooltip>
+                    </Grid>
+                    <Grid item xs={1}>
+                      <Tooltip title="Done" placement="top" arrow>
+                        <IconButton
+                          onMouseEnter={() => setHoveredIcon(`done-${todo.id}`)}
+                          onMouseLeave={() => setHoveredIcon(null)}
+                          onClick={() =>
+                            dispatch(toggleComplete({ id: todo.id }))
+                          }
+                        >
+                          {hoveredIcon === `done-${todo.id}` ? (
+                            <DoneIcon />
+                          ) : (
+                            <DoneOutlineRoundedIcon />
+                          )}
+                        </IconButton>
+                      </Tooltip>
+                    </Grid>
+                    <Grid item xs={1}>
+                      <Tooltip title="Delete" placement="top" arrow>
+                        <IconButton
+                          onMouseEnter={() =>
+                            setHoveredIcon(`delete-${todo.id}`)
+                          }
+                          onMouseLeave={() => setHoveredIcon(null)}
+                          onClick={() => dispatch(deleteTodo({ id: todo.id }))}
+                        >
+                          {hoveredIcon === `delete-${todo.id}` ? (
+                            <DeleteIcon />
+                          ) : (
+                            <DeleteOutlineOutlinedIcon />
+                          )}
+                        </IconButton>
+                      </Tooltip>
+                    </Grid>
                   </Grid>
-                  <Grid item xs={1}>
-                    <Tooltip title="Done" placement="top" arrow>
-                      <IconButton
-                        onMouseEnter={() => setHoveredIcon(`done-${todo.id}`)}
-                        onMouseLeave={() => setHoveredIcon(null)}
-                        onClick={() =>
-                          dispatch(toggleComplete({ id: todo.id }))
-                        }
-                      >
-                        {hoveredIcon === `done-${todo.id}` ? (
-                          <DoneIcon />
-                        ) : (
-                          <DoneOutlineRoundedIcon />
-                        )}
-                      </IconButton>
-                    </Tooltip>
-                  </Grid>
-                  <Grid item xs={1}>
-                    <Tooltip title="Delete" placement="top" arrow>
-                      <IconButton
-                        onMouseEnter={() => setHoveredIcon(`delete-${todo.id}`)}
-                        onMouseLeave={() => setHoveredIcon(null)}
-                        onClick={() => dispatch(deleteTodo({ id: todo.id }))}
-                      >
-                        {hoveredIcon === `delete-${todo.id}` ? (
-                          <DeleteIcon />
-                        ) : (
-                          <DeleteOutlineOutlinedIcon />
-                        )}
-                      </IconButton>
-                    </Tooltip>
-                  </Grid>
-                </Grid>
+                </div>
               )}
             </div>
           ))}
