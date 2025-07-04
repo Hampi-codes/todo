@@ -7,11 +7,11 @@ function App() {
   return (
     <>
       <h2>Work list</h2>
-      <Grid container alignItems="center" direction="column">
-        <Grid item width="70%">
+      <Grid container justifyContent="center">
+        <Grid item xs={12} sm={10} lg={8} xl={7}>
           <AddTodo />
         </Grid>
-        <Grid item width="70%">
+        <Grid item xs={12} sm={10} lg={8} xl={7}>
           <Todos />
         </Grid>
       </Grid>

@@ -83,7 +83,7 @@ export const Todos = () => {
                   draggedTodo?.id === todo.id ? "2px dashed #3f51b5" : "none",
                 borderRadius: "4px",
                 margin: "8px 0",
-                padding: "8px",
+                paddingRight: "8px",
               }}
             >
               {isUpdating === todo.id ? (
@@ -146,6 +146,7 @@ export const Todos = () => {
                             ? "line-through"
                             : "none",
                           color: todo.completed ? "gray" : "inherit",
+                          textAlign: "left"
                         }}
                       >
                         <RadioButtonCheckedIcon />
